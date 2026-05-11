@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "399188688512",
+    "firebase_url": "https://mini-smart-home-e541e-default-rtdb.firebaseio.com",
+    "project_id": "mini-smart-home-e541e",
+    "storage_bucket": "mini-smart-home-e541e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:399188688512:android:64ad77d16fba303e28b065",
+        "android_client_info": {
+          "package_name": "com.example.minismarthome"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNJcX1urS6gld33DU3Q_PXWSFNmPCRCco"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

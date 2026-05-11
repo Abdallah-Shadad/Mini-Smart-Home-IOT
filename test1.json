@@ -1,0 +1,36 @@
+{
+    "sensor": {
+        "temperature": 32,
+        "humidity": 65,
+        "light": 80,
+        "updatedAt": 1710000000
+    },
+    "control": {
+        "redLed": false,
+        "greenLed": true,
+        "yellowLed": false,
+        "autoMode": false
+    },
+    "alerts": {
+        "-alert1": {
+            "message": "High Temperature",
+            "type": "warning",
+            "time": 1710000000
+        }
+    },
+    "system": {
+        "deviceOnline": true,
+        "lastSeen": 1710000000
+    },
+    "history": {
+        "-id1": {
+            "temperature": 30,
+            "humidity": 60,
+            "light": 70,
+            "timestamp": 1710000000
+        }
+    },
+    "settings": {
+        "tempThreshold": 35
+    }
+}
