@@ -3,12 +3,14 @@ class ControlState {
   final bool greenLed;
   final bool yellowLed;
   final bool autoMode;
+  final bool buzzerEnabled; // Buzzer: true = buzzer is active/armed
 
   const ControlState({
     required this.redLed,
     required this.greenLed,
     required this.yellowLed,
     required this.autoMode,
+    required this.buzzerEnabled,
   });
 
   factory ControlState.fromMap(Map<dynamic, dynamic> map) {
@@ -17,6 +19,7 @@ class ControlState {
       greenLed: map['greenLed'] == true,
       yellowLed: map['yellowLed'] == true,
       autoMode: map['autoMode'] == true,
+      buzzerEnabled: map['buzzerEnabled'] == true,
     );
   }
 
@@ -26,6 +29,7 @@ class ControlState {
       greenLed: false,
       yellowLed: false,
       autoMode: false,
+      buzzerEnabled: false,
     );
   }
 
@@ -35,6 +39,7 @@ class ControlState {
       'greenLed': greenLed,
       'yellowLed': yellowLed,
       'autoMode': autoMode,
+      'buzzerEnabled': buzzerEnabled,
     };
   }
 
@@ -43,12 +48,14 @@ class ControlState {
     bool? greenLed,
     bool? yellowLed,
     bool? autoMode,
+    bool? buzzerEnabled,
   }) {
     return ControlState(
       redLed: redLed ?? this.redLed,
       greenLed: greenLed ?? this.greenLed,
       yellowLed: yellowLed ?? this.yellowLed,
       autoMode: autoMode ?? this.autoMode,
+      buzzerEnabled: buzzerEnabled ?? this.buzzerEnabled,
     );
   }
 }

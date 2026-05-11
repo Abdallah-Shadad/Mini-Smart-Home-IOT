@@ -39,30 +39,60 @@ class AnalyticsScreen extends StatelessWidget {
           : ListView(
               padding: const EdgeInsets.fromLTRB(18, 18, 18, 26),
               children: [
+                // ── Summary row ──────────────────────────────────────
                 _SummaryRow(history: history),
-                const SectionHeader(title: 'Temperature'),
+                const SizedBox(height: 4),
+
+                // ── Temperature ──────────────────────────────────────
+                const SectionHeader(title: 'Temperature (DHT11)'),
                 _ChartCard(
                   color: AppColors.tempColor,
                   minY: 0,
                   maxY: 50,
-                  spots: _spots(history, (point) => point.temperature),
-                  unit: 'C',
+                  spots: _spots(history, (p) => p.temperature),
+                  unit: '°C',
                 ),
-                const SectionHeader(title: 'Humidity'),
+
+                // ── Humidity ─────────────────────────────────────────
+                const SectionHeader(title: 'Humidity (DHT11)'),
                 _ChartCard(
                   color: AppColors.humidColor,
                   minY: 0,
                   maxY: 100,
-                  spots: _spots(history, (point) => point.humidity),
+                  spots: _spots(history, (p) => p.humidity),
                   unit: '%',
                 ),
-                const SectionHeader(title: 'Light'),
+
+                // ── Light ────────────────────────────────────────────
+                const SectionHeader(title: 'Light Level (LDR)'),
                 _ChartCard(
                   color: AppColors.lightColor,
                   minY: 0,
                   maxY: 100,
-                  spots: _spots(history, (point) => point.light),
+                  spots: _spots(history, (p) => p.light),
                   unit: '%',
+                ),
+
+                // ── NEW: Gas / Smoke ─────────────────────────────────
+                const SectionHeader(title: 'Gas / Smoke Level (MQ2)'),
+                _ChartCard(
+                  color: AppColors.gasColor,
+                  minY: 0,
+                  maxY: 100,
+                  spots: _spots(history, (p) => p.gasLevel),
+                  unit: '%',
+                  dangerThreshold: 50, // red zone above 50 %
+                ),
+
+                // ── NEW: Flame intensity ─────────────────────────────
+                const SectionHeader(title: 'Flame Intensity (Flame Sensor)'),
+                _ChartCard(
+                  color: AppColors.flameColor,
+                  minY: 0,
+                  maxY: 100,
+                  spots: _spots(history, (p) => p.flameIntensity),
+                  unit: '%',
+                  dangerThreshold: 20, // any reading above 20 is suspicious
                 ),
               ],
             ),
@@ -71,83 +101,84 @@ class AnalyticsScreen extends StatelessWidget {
 
   static List<FlSpot> _spots(
     List<HistoryPoint> history,
-    double Function(HistoryPoint point) valueOf,
+    double Function(HistoryPoint p) valueOf,
   ) {
     return List<FlSpot>.generate(
       history.length,
-      (index) => FlSpot(index.toDouble(), valueOf(history[index])),
+      (i) => FlSpot(i.toDouble(), valueOf(history[i])),
     );
   }
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Summary metric pills at the top
+// ─────────────────────────────────────────────────────────────────
 class _SummaryRow extends StatelessWidget {
   final List<HistoryPoint> history;
-
   const _SummaryRow({required this.history});
+
+  double _avg(Iterable<double> v) =>
+      v.isEmpty ? 0 : v.reduce((a, b) => a + b) / v.length;
 
   @override
   Widget build(BuildContext context) {
-    final latest = history.isEmpty ? null : history.last;
+    if (history.isEmpty) return const SizedBox.shrink();
 
-    return Row(
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
       children: [
-        Expanded(
-          child: _MetricPill(
-            label: 'Avg Temp',
-            value: latest == null
-                ? '--'
-                : '${_average(history.map((e) => e.temperature)).toStringAsFixed(1)} C',
-            color: AppColors.tempColor,
-          ),
+        _Pill(
+          label: 'Avg Temp',
+          value:
+              '${_avg(history.map((e) => e.temperature)).toStringAsFixed(1)} °C',
+          color: AppColors.tempColor,
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _MetricPill(
-            label: 'Avg Humidity',
-            value: latest == null
-                ? '--'
-                : '${_average(history.map((e) => e.humidity)).toStringAsFixed(0)}%',
-            color: AppColors.humidColor,
-          ),
+        _Pill(
+          label: 'Avg Humidity',
+          value: '${_avg(history.map((e) => e.humidity)).toStringAsFixed(0)} %',
+          color: AppColors.humidColor,
+        ),
+        _Pill(
+          label: 'Avg Gas',
+          value: '${_avg(history.map((e) => e.gasLevel)).toStringAsFixed(0)} %',
+          color: AppColors.gasColor,
+        ),
+        _Pill(
+          label: 'Max Flame',
+          value:
+              '${history.map((e) => e.flameIntensity).reduce((a, b) => a > b ? a : b).toStringAsFixed(0)} %',
+          color: AppColors.flameColor,
         ),
       ],
     );
   }
-
-  double _average(Iterable<double> values) {
-    if (values.isEmpty) return 0;
-    return values.reduce((a, b) => a + b) / values.length;
-  }
 }
 
-class _MetricPill extends StatelessWidget {
+class _Pill extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-
-  const _MetricPill({
-    required this.label,
-    required this.value,
-    required this.color,
-  });
+  const _Pill({required this.label, required this.value, required this.color});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.28)),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(label, style: Theme.of(context).textTheme.bodySmall),
-          const SizedBox(height: 5),
+          const SizedBox(height: 4),
           Text(
             value,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: color,
                   fontWeight: FontWeight.w800,
                 ),
@@ -158,12 +189,16 @@ class _MetricPill extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Chart card — now supports optional dangerThreshold line
+// ─────────────────────────────────────────────────────────────────
 class _ChartCard extends StatelessWidget {
   final List<FlSpot> spots;
   final Color color;
   final double minY;
   final double maxY;
   final String unit;
+  final double? dangerThreshold; // draws a dashed red line if provided
 
   const _ChartCard({
     required this.spots,
@@ -171,6 +206,7 @@ class _ChartCard extends StatelessWidget {
     required this.minY,
     required this.maxY,
     required this.unit,
+    this.dangerThreshold,
   });
 
   @override
@@ -179,7 +215,7 @@ class _ChartCard extends StatelessWidget {
     final safeSpots = spots.isEmpty ? const [FlSpot(0, 0)] : spots;
 
     return Container(
-      height: 250,
+      height: 220,
       padding: const EdgeInsets.fromLTRB(12, 18, 18, 10),
       decoration: BoxDecoration(
         color: theme.cardColor,
@@ -189,10 +225,7 @@ class _ChartCard extends StatelessWidget {
       child: LineChart(
         LineChartData(
           minX: 0,
-          maxX: (safeSpots.length - 1)
-              .toDouble()
-              .clamp(1, double.infinity)
-              .toDouble(),
+          maxX: (safeSpots.length - 1).toDouble().clamp(1, double.infinity),
           minY: minY,
           maxY: maxY,
           gridData: FlGridData(
@@ -203,24 +236,43 @@ class _ChartCard extends StatelessWidget {
               strokeWidth: 1,
             ),
           ),
+          // Extra horizontal lines: danger threshold
+          extraLinesData: dangerThreshold != null
+              ? ExtraLinesData(
+                  horizontalLines: [
+                    HorizontalLine(
+                      y: dangerThreshold!,
+                      color: AppColors.alertDanger.withOpacity(0.7),
+                      strokeWidth: 1.5,
+                      dashArray: [6, 4],
+                      label: HorizontalLineLabel(
+                        show: true,
+                        alignment: Alignment.topRight,
+                        style: const TextStyle(
+                          color: AppColors.alertDanger,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        labelResolver: (_) => ' ALERT',
+                      ),
+                    ),
+                  ],
+                )
+              : null,
           titlesData: FlTitlesData(
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
+            topTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
                 reservedSize: 38,
                 interval: maxY / 4,
-                getTitlesWidget: (value, meta) {
-                  return Text(
-                    value.toInt().toString(),
-                    style: theme.textTheme.bodySmall,
-                  );
-                },
+                getTitlesWidget: (value, meta) => Text(
+                  value.toInt().toString(),
+                  style: theme.textTheme.bodySmall,
+                ),
               ),
             ),
             bottomTitles: AxisTitles(
@@ -250,14 +302,12 @@ class _ChartCard extends StatelessWidget {
           lineTouchData: LineTouchData(
             touchTooltipData: LineTouchTooltipData(
               tooltipRoundedRadius: 10,
-              getTooltipItems: (items) {
-                return items.map((item) {
-                  return LineTooltipItem(
-                    '${item.y.toStringAsFixed(1)} $unit',
-                    TextStyle(color: color, fontWeight: FontWeight.w700),
-                  );
-                }).toList();
-              },
+              getTooltipItems: (items) => items
+                  .map((item) => LineTooltipItem(
+                        '${item.y.toStringAsFixed(1)} $unit',
+                        TextStyle(color: color, fontWeight: FontWeight.w700),
+                      ))
+                  .toList(),
             ),
           ),
           lineBarsData: [
@@ -270,7 +320,7 @@ class _ChartCard extends StatelessWidget {
               dotData: const FlDotData(show: false),
               belowBarData: BarAreaData(
                 show: true,
-                color: color.withOpacity(0.14),
+                color: color.withOpacity(0.12),
               ),
             ),
           ],

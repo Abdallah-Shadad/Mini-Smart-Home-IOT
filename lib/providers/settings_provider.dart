@@ -5,11 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SettingsProvider extends ChangeNotifier {
   bool _darkMode = true;
   double _tempThreshold = 35.0;
+  double _gasThreshold = 50.0; // NEW: MQ2 gas alert threshold (%)
   bool _isLoading = true;
   bool _isSaving = false;
 
   bool get darkMode => _darkMode;
   double get tempThreshold => _tempThreshold;
+  double get gasThreshold => _gasThreshold;
   bool get isLoading => _isLoading;
   bool get isSaving => _isSaving;
 
@@ -17,17 +19,18 @@ class SettingsProvider extends ChangeNotifier {
       FirebaseDatabase.instance.ref('settings');
 
   Future<void> init() async {
-    // Load dark mode from local storage
+    // Load dark mode from local storage (no network needed)
     final prefs = await SharedPreferences.getInstance();
     _darkMode = prefs.getBool('darkMode') ?? true;
     _isLoading = false;
     notifyListeners();
 
-    // Listen to threshold from Firebase
+    // Listen to thresholds from Firebase
     _settingsRef.onValue.listen((event) {
       if (event.snapshot.value != null) {
         final map = event.snapshot.value as Map<dynamic, dynamic>;
         _tempThreshold = (map['tempThreshold'] ?? 35).toDouble();
+        _gasThreshold = (map['gasThreshold'] ?? 50).toDouble();
         notifyListeners();
       }
     });
@@ -43,11 +46,21 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setTempThreshold(double value) async {
     _tempThreshold = value;
     notifyListeners();
+    await _saveToFirebase({'tempThreshold': value});
+  }
 
+  // NEW
+  Future<void> setGasThreshold(double value) async {
+    _gasThreshold = value;
+    notifyListeners();
+    await _saveToFirebase({'gasThreshold': value});
+  }
+
+  Future<void> _saveToFirebase(Map<String, dynamic> data) async {
     _isSaving = true;
     notifyListeners();
     try {
-      await _settingsRef.update({'tempThreshold': value});
+      await _settingsRef.update(data);
     } catch (_) {}
     _isSaving = false;
     notifyListeners();

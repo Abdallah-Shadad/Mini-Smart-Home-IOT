@@ -26,6 +26,15 @@ class AppColors {
   static const onlineColor = Color(0xFF00C9A7);
   static const offlineColor = Color(0xFFFF4757);
 
+  // NEW: MQ2 gas sensor
+  static const gasColor = Color(0xFFB8860B); // dark goldenrod / smoky amber
+
+  // NEW: Flame sensor
+  static const flameColor = Color(0xFFFF4500); // OrangeRed — fire
+
+  // NEW: Buzzer
+  static const buzzerColor = Color(0xFF9B59B6); // Purple
+
   // LED colors
   static const redLed = Color(0xFFFF4757);
   static const greenLed = Color(0xFF2ED573);
@@ -86,9 +95,7 @@ class AppTheme {
       ),
       switchTheme: SwitchThemeData(
         thumbColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
-            return AppColors.primary;
-          }
+          if (states.contains(MaterialState.selected)) return AppColors.primary;
           return Colors.grey;
         }),
         trackColor: MaterialStateProperty.resolveWith((states) {

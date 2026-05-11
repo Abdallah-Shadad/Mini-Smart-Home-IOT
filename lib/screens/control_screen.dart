@@ -19,19 +19,22 @@ class ControlScreen extends StatelessWidget {
     return Scaffold(
       appBar: const CustomAppBar(
         title: 'Controls',
-        subtitle: 'Manage lights and automation',
+        subtitle: 'Manage lights, buzzer and automation',
       ),
       body: provider.isLoading
           ? const LoadingView(message: 'Loading controls...')
           : ListView(
               padding: const EdgeInsets.fromLTRB(18, 18, 18, 26),
               children: [
+                // ── Auto mode card ──────────────────────────────────
                 _AutoModeCard(
                   enabled: state.autoMode,
                   saving: provider.isSaving,
                   onChanged: provider.setAutoMode,
                 ),
                 const SizedBox(height: 8),
+
+                // ── LED section ─────────────────────────────────────
                 SectionHeader(
                   title: 'LED Lights',
                   trailing: provider.isSaving
@@ -65,6 +68,17 @@ class ControlScreen extends StatelessWidget {
                   isDisabled: state.autoMode || provider.isSaving,
                   onChanged: provider.setYellowLed,
                 ),
+
+                // ── NEW: Buzzer section ─────────────────────────────
+                const SectionHeader(title: 'Alarm'),
+                _BuzzerCard(
+                  enabled: state.buzzerEnabled,
+                  isAutoMode: state.autoMode,
+                  saving: provider.isSaving,
+                  onChanged: provider.setBuzzerEnabled,
+                ),
+
+                // ── Error display ───────────────────────────────────
                 if (provider.error != null) ...[
                   const SizedBox(height: 16),
                   _InlineError(message: provider.error!),
@@ -75,6 +89,9 @@ class ControlScreen extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Auto mode card
+// ─────────────────────────────────────────────────────────────────
 class _AutoModeCard extends StatelessWidget {
   final bool enabled;
   final bool saving;
@@ -111,7 +128,8 @@ class _AutoModeCard extends StatelessWidget {
               color: AppColors.primary.withOpacity(0.15),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(Icons.auto_mode_rounded, color: AppColors.primary),
+            child:
+                const Icon(Icons.auto_mode_rounded, color: AppColors.primary),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -122,8 +140,8 @@ class _AutoModeCard extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   enabled
-                      ? 'Device logic is controlling the LEDs.'
-                      : 'Manual LED controls are enabled.',
+                      ? 'NodeMCU logic controls LEDs and buzzer.'
+                      : 'Manual controls are fully enabled.',
                   style: theme.textTheme.bodySmall,
                 ),
               ],
@@ -136,6 +154,105 @@ class _AutoModeCard extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────
+// NEW: Buzzer card
+// ─────────────────────────────────────────────────────────────────
+class _BuzzerCard extends StatelessWidget {
+  final bool enabled;
+  final bool isAutoMode;
+  final bool saving;
+  final ValueChanged<bool> onChanged;
+
+  const _BuzzerCard({
+    required this.enabled,
+    required this.isAutoMode,
+    required this.saving,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: enabled
+            ? AppColors.buzzerColor.withOpacity(isDark ? 0.14 : 0.08)
+            : (isDark ? AppColors.darkCard : AppColors.lightCard),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: enabled
+              ? AppColors.buzzerColor.withOpacity(0.5)
+              : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+          width: enabled ? 1.5 : 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          // Animated buzzer icon
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.buzzerColor.withOpacity(enabled ? 0.2 : 0.1),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              enabled ? Icons.volume_up_rounded : Icons.volume_off_rounded,
+              color: AppColors.buzzerColor,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Buzzer (Alarm)',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: isAutoMode
+                          ? (isDark ? Colors.white38 : Colors.black38)
+                          : null,
+                    )),
+                const SizedBox(height: 3),
+                Text(
+                  isAutoMode
+                      ? 'Controlled automatically by NodeMCU in Auto Mode.'
+                      : enabled
+                          ? 'Buzzer is ARMED — will sound on gas or flame.'
+                          : 'Buzzer is OFF. Enable to arm the alarm.',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: enabled,
+            onChanged: (isAutoMode || saving) ? null : onChanged,
+            thumbColor: MaterialStateProperty.resolveWith((states) {
+              if (states.contains(MaterialState.selected)) {
+                return AppColors.buzzerColor;
+              }
+              return null;
+            }),
+            trackColor: MaterialStateProperty.resolveWith((states) {
+              if (states.contains(MaterialState.selected)) {
+                return AppColors.buzzerColor.withOpacity(0.4);
+              }
+              return null;
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Inline error display
+// ─────────────────────────────────────────────────────────────────
 class _InlineError extends StatelessWidget {
   final String message;
 

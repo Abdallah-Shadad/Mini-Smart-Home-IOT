@@ -25,6 +25,10 @@ class DashboardScreen extends StatelessWidget {
     final status = sensorProvider.systemStatus;
     final recentAlerts = alertsProvider.alerts.take(3).toList();
 
+    // Danger banners
+    final bool gasDanger = sensor.gasLevel > 50;
+    final bool flameDanger = sensor.flameDetected;
+
     return Scaffold(
       appBar: CustomAppBar(
         title: 'Dashboard',
@@ -51,13 +55,22 @@ class DashboardScreen extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(18, 18, 18, 26),
                 children: [
+                  // ── Danger alerts banner ──────────────────────────
+                  if (gasDanger || flameDanger)
+                    _DangerBanner(gas: gasDanger, flame: flameDanger),
+                  if (gasDanger || flameDanger) const SizedBox(height: 12),
+
+                  // ── Device status card ────────────────────────────
                   _StatusOverview(
                     online: status.deviceOnline,
                     lastSeen: status.lastSeen,
                     autoMode: controlProvider.state.autoMode,
+                    buzzerOn: controlProvider.state.buzzerEnabled,
                   ),
                   const SizedBox(height: 10),
-                  const SectionHeader(title: 'Live Sensors'),
+
+                  // ── Original sensors ──────────────────────────────
+                  const SectionHeader(title: 'Climate Sensors'),
                   LayoutBuilder(
                     builder: (context, constraints) {
                       final compact = constraints.maxWidth < 560;
@@ -75,8 +88,9 @@ class DashboardScreen extends StatelessWidget {
                             unit: 'C',
                             icon: Icons.thermostat_rounded,
                             color: AppColors.tempColor,
-                            percentage:
-                                (sensor.temperature / 50).clamp(0, 1).toDouble(),
+                            percentage: (sensor.temperature / 50)
+                                .clamp(0, 1)
+                                .toDouble(),
                           ),
                           SensorCard(
                             label: 'Humidity',
@@ -100,6 +114,53 @@ class DashboardScreen extends StatelessWidget {
                       );
                     },
                   ),
+
+                  // ── NEW sensors row ───────────────────────────────
+                  const SectionHeader(title: 'Safety Sensors'),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final compact = constraints.maxWidth < 560;
+                      return GridView.count(
+                        crossAxisCount: compact ? 1 : 2,
+                        childAspectRatio: compact ? 2.15 : 1.35,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        children: [
+                          // MQ2 gas
+                          SensorCard(
+                            label: 'Gas / Smoke (MQ2)',
+                            value: sensor.gasLevel.toStringAsFixed(0),
+                            unit: '%',
+                            icon: Icons.air_rounded,
+                            color: gasDanger
+                                ? AppColors.alertDanger
+                                : AppColors.gasColor,
+                            percentage:
+                                (sensor.gasLevel / 100).clamp(0, 1).toDouble(),
+                          ),
+                          // Flame sensor
+                          SensorCard(
+                            label: sensor.flameDetected
+                                ? '⚠ FLAME DETECTED'
+                                : 'Flame Sensor',
+                            value: sensor.flameIntensity.toStringAsFixed(0),
+                            unit: '%',
+                            icon: Icons.local_fire_department_rounded,
+                            color: flameDanger
+                                ? AppColors.alertDanger
+                                : AppColors.flameColor,
+                            percentage: (sensor.flameIntensity / 100)
+                                .clamp(0, 1)
+                                .toDouble(),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+
+                  // ── Recent alerts ─────────────────────────────────
                   SectionHeader(
                     title: 'Recent Alerts',
                     trailing: Text(
@@ -122,15 +183,67 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Danger banner shown when gas > 50 % or flame detected
+// ─────────────────────────────────────────────────────────────────
+class _DangerBanner extends StatelessWidget {
+  final bool gas;
+  final bool flame;
+
+  const _DangerBanner({required this.gas, required this.flame});
+
+  @override
+  Widget build(BuildContext context) {
+    final parts = <String>[];
+    if (gas) parts.add('High gas / smoke level detected by MQ2!');
+    if (flame) parts.add('Flame detected! Check for fire immediately.');
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.alertDanger.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.alertDanger.withOpacity(0.5)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.warning_rounded,
+              color: AppColors.alertDanger, size: 22),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: parts
+                  .map((t) => Text(t,
+                      style: const TextStyle(
+                        color: AppColors.alertDanger,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                      )))
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Status overview card
+// ─────────────────────────────────────────────────────────────────
 class _StatusOverview extends StatelessWidget {
   final bool online;
   final int lastSeen;
   final bool autoMode;
+  final bool buzzerOn;
 
   const _StatusOverview({
     required this.online,
     required this.lastSeen,
     required this.autoMode,
+    required this.buzzerOn,
   });
 
   @override
@@ -157,19 +270,18 @@ class _StatusOverview extends StatelessWidget {
               color: AppColors.primary.withOpacity(0.18),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(
-              Icons.sensors_rounded,
-              color: AppColors.primary,
-              size: 28,
-            ),
+            child: const Icon(Icons.sensors_rounded,
+                color: AppColors.primary, size: 28),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Device ${online ? 'connected' : 'offline'}',
-                    style: theme.textTheme.titleMedium),
+                Text(
+                  'Device ${online ? 'connected' : 'offline'}',
+                  style: theme.textTheme.titleMedium,
+                ),
                 const SizedBox(height: 3),
                 Text(
                   'Last seen ${Formatters.timeAgo(lastSeen)}',
@@ -178,10 +290,25 @@ class _StatusOverview extends StatelessWidget {
               ],
             ),
           ),
-          StatusBadge(
-            label: autoMode ? 'Auto' : 'Manual',
-            color: autoMode ? AppColors.primary : AppColors.accent,
-            icon: autoMode ? Icons.auto_mode_rounded : Icons.touch_app_rounded,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              StatusBadge(
+                label: autoMode ? 'Auto' : 'Manual',
+                color: autoMode ? AppColors.primary : AppColors.accent,
+                icon: autoMode
+                    ? Icons.auto_mode_rounded
+                    : Icons.touch_app_rounded,
+              ),
+              const SizedBox(height: 6),
+              StatusBadge(
+                label: buzzerOn ? 'Buzzer ON' : 'Buzzer OFF',
+                color: buzzerOn ? AppColors.buzzerColor : AppColors.darkBorder,
+                icon: buzzerOn
+                    ? Icons.volume_up_rounded
+                    : Icons.volume_off_rounded,
+              ),
+            ],
           ),
         ],
       ),
