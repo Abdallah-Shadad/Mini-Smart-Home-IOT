@@ -1,9 +1,14 @@
+/// ControlState
+///
+/// ESP8266 writes int 0 or 1 for LED fields.
+/// Flutter writes bool true/false.
+/// _toBool() handles both so nothing crashes.
 class ControlState {
   final bool redLed;
   final bool greenLed;
   final bool yellowLed;
   final bool autoMode;
-  final bool buzzerEnabled; // Buzzer: true = buzzer is active/armed
+  final bool buzzerEnabled;
 
   const ControlState({
     required this.redLed,
@@ -15,11 +20,11 @@ class ControlState {
 
   factory ControlState.fromMap(Map<dynamic, dynamic> map) {
     return ControlState(
-      redLed: map['redLed'] == true,
-      greenLed: map['greenLed'] == true,
-      yellowLed: map['yellowLed'] == true,
-      autoMode: map['autoMode'] == true,
-      buzzerEnabled: map['buzzerEnabled'] == true,
+      redLed: _toBool(map['redLed']),
+      greenLed: _toBool(map['greenLed']),
+      yellowLed: _toBool(map['yellowLed']),
+      autoMode: _toBool(map['autoMode']),
+      buzzerEnabled: _toBool(map['buzzerEnabled']),
     );
   }
 
@@ -57,5 +62,13 @@ class ControlState {
       autoMode: autoMode ?? this.autoMode,
       buzzerEnabled: buzzerEnabled ?? this.buzzerEnabled,
     );
+  }
+
+  static bool _toBool(dynamic v) {
+    if (v == null) return false;
+    if (v is bool) return v;
+    if (v is int) return v != 0;
+    if (v is double) return v != 0.0;
+    return false;
   }
 }

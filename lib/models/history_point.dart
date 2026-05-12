@@ -1,16 +1,18 @@
+/// HistoryPoint — one data point for the analytics charts.
+/// Written by SensorProvider to /history on every sensor update.
 class HistoryPoint {
   final int timestamp;
   final double temperature;
-  final double light;
   final double humidity;
-  final double gasLevel; // MQ2 %
-  final double flameIntensity; // Flame sensor %
+  final double light;
+  final double gasLevel;
+  final double flameIntensity;
 
   const HistoryPoint({
     required this.timestamp,
     required this.temperature,
-    required this.light,
     required this.humidity,
+    required this.light,
     required this.gasLevel,
     required this.flameIntensity,
   });
@@ -19,8 +21,8 @@ class HistoryPoint {
     return HistoryPoint(
       timestamp: (map['timestamp'] ?? 0).toInt(),
       temperature: (map['temperature'] ?? 0).toDouble(),
-      light: (map['light'] ?? 0).toDouble(),
       humidity: (map['humidity'] ?? 0).toDouble(),
+      light: (map['light'] ?? 0).toDouble(),
       gasLevel: (map['gasLevel'] ?? 0).toDouble(),
       flameIntensity: (map['flameIntensity'] ?? 0).toDouble(),
     );
@@ -30,8 +32,8 @@ class HistoryPoint {
     return {
       'timestamp': timestamp,
       'temperature': temperature,
-      'light': light,
       'humidity': humidity,
+      'light': light,
       'gasLevel': gasLevel,
       'flameIntensity': flameIntensity,
     };

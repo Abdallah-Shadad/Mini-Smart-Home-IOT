@@ -3,6 +3,11 @@ import 'package:flutter/foundation.dart';
 import '../models/history_point.dart';
 import '../utils/dummy_data.dart';
 
+/// AnalyticsProvider
+///
+/// Listens to /history limitToLast(50) in realtime.
+/// SensorProvider writes a new point every time ESP8266 sends data.
+/// If /history is empty → show dummy data so charts are never blank.
 class AnalyticsProvider extends ChangeNotifier {
   List<HistoryPoint> _history = [];
   bool _isLoading = true;
@@ -23,6 +28,7 @@ class AnalyticsProvider extends ChangeNotifier {
     _ref.limitToLast(50).onValue.listen(
       (event) {
         final raw = event.snapshot.value;
+
         if (raw != null && raw is Map && raw.isNotEmpty) {
           final list = <HistoryPoint>[];
           raw.forEach((key, value) {
@@ -34,16 +40,15 @@ class AnalyticsProvider extends ChangeNotifier {
           _history = list;
           _usingDummy = false;
         } else {
-          // Firebase empty → inject dummy data for demo
           _history = DummyData.generateHistory(hours: 24);
           _usingDummy = true;
         }
+
         _isLoading = false;
         _error = null;
         notifyListeners();
       },
       onError: (e) {
-        // Even on error, show dummy data so the demo looks good
         _history = DummyData.generateHistory(hours: 24);
         _usingDummy = true;
         _isLoading = false;

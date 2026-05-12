@@ -44,9 +44,6 @@ class ControlProvider extends ChangeNotifier {
   Future<void> setGreenLed(bool value) => _update({'greenLed': value});
   Future<void> setYellowLed(bool value) => _update({'yellowLed': value});
   Future<void> setAutoMode(bool value) => _update({'autoMode': value});
-
-  /// Enables or disables the buzzer from the app side.
-  /// In Auto Mode the hardware controls this automatically.
   Future<void> setBuzzerEnabled(bool value) =>
       _update({'buzzerEnabled': value});
 
@@ -54,7 +51,6 @@ class ControlProvider extends ChangeNotifier {
     _isSaving = true;
     _error = null;
     notifyListeners();
-
     try {
       await _ref.update(data);
     } catch (e) {

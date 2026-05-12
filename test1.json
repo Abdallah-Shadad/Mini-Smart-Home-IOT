@@ -1,40 +1,90 @@
 {
     "sensor": {
-        "temperature": 28,
-        "humidity": 60,
-        "light": 70,
-        "gasLevel": 10,
-        "flameDetected": false,
-        "flameIntensity": 0,
+        "temperature": 31.5,
+        "humidity": 67.2,
+        "light": 1,
+        "gas": 420,
+        "flame": 1,
         "updatedAt": 1710000000
     },
     "control": {
         "redLed": false,
-        "greenLed": false,
+        "greenLed": true,
         "yellowLed": false,
         "autoMode": false,
         "buzzerEnabled": false
     },
     "alerts": {
-        "-alert1": {
-            "message": "High Temperature",
-            "type": "warning",
+        "current": {
+            "message": "Safe",
+            "type": "info",
             "time": 1710000000
         }
     },
-    "system": {
-        "deviceOnline": true,
-        "lastSeen": 1710000000
-    },
     "history": {
-        "-id1": {
-            "temperature": 30,
-            "humidity": 60,
-            "light": 70,
-            "timestamp": 1710000000
+        "-Nhistory1": {
+            "timestamp": 1710000000,
+            "temperature": 28.0,
+            "humidity": 60.0,
+            "light": 100.0,
+            "gasLevel": 20.0,
+            "flameIntensity": 0.0
+        },
+        "-Nhistory2": {
+            "timestamp": 1710000300,
+            "temperature": 29.0,
+            "humidity": 61.0,
+            "light": 90.0,
+            "gasLevel": 22.0,
+            "flameIntensity": 0.0
+        },
+        "-Nhistory3": {
+            "timestamp": 1710000600,
+            "temperature": 30.0,
+            "humidity": 63.0,
+            "light": 80.0,
+            "gasLevel": 25.0,
+            "flameIntensity": 0.0
+        },
+        "-Nhistory4": {
+            "timestamp": 1710000900,
+            "temperature": 31.0,
+            "humidity": 65.0,
+            "light": 70.0,
+            "gasLevel": 28.0,
+            "flameIntensity": 0.0
+        },
+        "-Nhistory5": {
+            "timestamp": 1710001200,
+            "temperature": 32.0,
+            "humidity": 66.0,
+            "light": 60.0,
+            "gasLevel": 35.0,
+            "flameIntensity": 0.0
+        },
+        "-Nhistory6": {
+            "timestamp": 1710001500,
+            "temperature": 34.0,
+            "humidity": 68.0,
+            "light": 40.0,
+            "gasLevel": 45.0,
+            "flameIntensity": 0.0
+        },
+        "-Nhistory7": {
+            "timestamp": 1710001800,
+            "temperature": 36.0,
+            "humidity": 70.0,
+            "light": 20.0,
+            "gasLevel": 75.0,
+            "flameIntensity": 100.0
         }
     },
     "settings": {
-        "tempThreshold": 35
+        "tempThreshold": 35,
+        "gasThreshold": 50
+    },
+    "system": {
+        "deviceOnline": true,
+        "lastSeen": 1710001800
     }
 }

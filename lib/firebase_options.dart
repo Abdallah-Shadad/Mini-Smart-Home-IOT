@@ -41,53 +41,51 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyA_TcovrpfWnHCrAGQHjcsq-kdXEyHyH8w',
-    appId: '1:399188688512:web:a7fb6c461c6d4ada28b065',
-    messagingSenderId: '399188688512',
-    projectId: 'mini-smart-home-e541e',
-    authDomain: 'mini-smart-home-e541e.firebaseapp.com',
-    databaseURL: 'https://mini-smart-home-e541e-default-rtdb.firebaseio.com',
-    storageBucket: 'mini-smart-home-e541e.firebasestorage.app',
-    measurementId: 'G-1TC4FCRRGL',
+    apiKey: 'AIzaSyDiK0Y1yi4OrmQNz0O7VQ2jbplGwAMXWZw',
+    appId: '1:285182170294:web:f16ea595075a8c06f7c217',
+    messagingSenderId: '285182170294',
+    projectId: 'smart-home-new-a9eb7',
+    authDomain: 'smart-home-new-a9eb7.firebaseapp.com',
+    databaseURL: 'https://smart-home-new-a9eb7-default-rtdb.firebaseio.com',
+    storageBucket: 'smart-home-new-a9eb7.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCNJcX1urS6gld33DU3Q_PXWSFNmPCRCco',
-    appId: '1:399188688512:android:64ad77d16fba303e28b065',
-    messagingSenderId: '399188688512',
-    projectId: 'mini-smart-home-e541e',
-    databaseURL: 'https://mini-smart-home-e541e-default-rtdb.firebaseio.com',
-    storageBucket: 'mini-smart-home-e541e.firebasestorage.app',
+    apiKey: 'AIzaSyAR1FTVY92Js7cLNhxDkPmHAFMMgzvu780',
+    appId: '1:285182170294:android:61d127899b84e9c5f7c217',
+    messagingSenderId: '285182170294',
+    projectId: 'smart-home-new-a9eb7',
+    databaseURL: 'https://smart-home-new-a9eb7-default-rtdb.firebaseio.com',
+    storageBucket: 'smart-home-new-a9eb7.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBgqf_UUWLqsqR2CyWAH1UigrOhGypWj6w',
-    appId: '1:399188688512:ios:e62e88376bc483a628b065',
-    messagingSenderId: '399188688512',
-    projectId: 'mini-smart-home-e541e',
-    databaseURL: 'https://mini-smart-home-e541e-default-rtdb.firebaseio.com',
-    storageBucket: 'mini-smart-home-e541e.firebasestorage.app',
+    apiKey: 'AIzaSyDo6xqO093ssLiOMZHGkTx0gzPVDZCIMQc',
+    appId: '1:285182170294:ios:723d163198a87c59f7c217',
+    messagingSenderId: '285182170294',
+    projectId: 'smart-home-new-a9eb7',
+    databaseURL: 'https://smart-home-new-a9eb7-default-rtdb.firebaseio.com',
+    storageBucket: 'smart-home-new-a9eb7.firebasestorage.app',
     iosBundleId: 'com.example.minismarthome',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBgqf_UUWLqsqR2CyWAH1UigrOhGypWj6w',
-    appId: '1:399188688512:ios:e62e88376bc483a628b065',
-    messagingSenderId: '399188688512',
-    projectId: 'mini-smart-home-e541e',
-    databaseURL: 'https://mini-smart-home-e541e-default-rtdb.firebaseio.com',
-    storageBucket: 'mini-smart-home-e541e.firebasestorage.app',
+    apiKey: 'AIzaSyDo6xqO093ssLiOMZHGkTx0gzPVDZCIMQc',
+    appId: '1:285182170294:ios:723d163198a87c59f7c217',
+    messagingSenderId: '285182170294',
+    projectId: 'smart-home-new-a9eb7',
+    databaseURL: 'https://smart-home-new-a9eb7-default-rtdb.firebaseio.com',
+    storageBucket: 'smart-home-new-a9eb7.firebasestorage.app',
     iosBundleId: 'com.example.minismarthome',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyA_TcovrpfWnHCrAGQHjcsq-kdXEyHyH8w',
-    appId: '1:399188688512:web:515ce9912d622e5528b065',
-    messagingSenderId: '399188688512',
-    projectId: 'mini-smart-home-e541e',
-    authDomain: 'mini-smart-home-e541e.firebaseapp.com',
-    databaseURL: 'https://mini-smart-home-e541e-default-rtdb.firebaseio.com',
-    storageBucket: 'mini-smart-home-e541e.firebasestorage.app',
-    measurementId: 'G-MRS6183VVC',
+    apiKey: 'AIzaSyDiK0Y1yi4OrmQNz0O7VQ2jbplGwAMXWZw',
+    appId: '1:285182170294:web:e190b03f58f5ae57f7c217',
+    messagingSenderId: '285182170294',
+    projectId: 'smart-home-new-a9eb7',
+    authDomain: 'smart-home-new-a9eb7.firebaseapp.com',
+    databaseURL: 'https://smart-home-new-a9eb7-default-rtdb.firebaseio.com',
+    storageBucket: 'smart-home-new-a9eb7.firebasestorage.app',
   );
 }

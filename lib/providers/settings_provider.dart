@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SettingsProvider extends ChangeNotifier {
   bool _darkMode = true;
   double _tempThreshold = 35.0;
-  double _gasThreshold = 50.0; // NEW: MQ2 gas alert threshold (%)
+  double _gasThreshold = 50.0;
   bool _isLoading = true;
   bool _isSaving = false;
 
@@ -19,13 +19,11 @@ class SettingsProvider extends ChangeNotifier {
       FirebaseDatabase.instance.ref('settings');
 
   Future<void> init() async {
-    // Load dark mode from local storage (no network needed)
     final prefs = await SharedPreferences.getInstance();
     _darkMode = prefs.getBool('darkMode') ?? true;
     _isLoading = false;
     notifyListeners();
 
-    // Listen to thresholds from Firebase
     _settingsRef.onValue.listen((event) {
       if (event.snapshot.value != null) {
         final map = event.snapshot.value as Map<dynamic, dynamic>;
@@ -46,14 +44,13 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setTempThreshold(double value) async {
     _tempThreshold = value;
     notifyListeners();
-    await _saveToFirebase({'tempThreshold': value});
+    await _saveToFirebase({'tempThreshold': value.toInt()});
   }
 
-  // NEW
   Future<void> setGasThreshold(double value) async {
     _gasThreshold = value;
     notifyListeners();
-    await _saveToFirebase({'gasThreshold': value});
+    await _saveToFirebase({'gasThreshold': value.toInt()});
   }
 
   Future<void> _saveToFirebase(Map<String, dynamic> data) async {
